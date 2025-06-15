@@ -45,7 +45,7 @@ class Sowing:
                 "type": "function"
             }
         ]
-        self.REF_CODE = "ZRCD77BC" # U can change it with yours.
+        self.REF_CODE = "ZRCD77BC"  # You can change it with yours.
         self.CAPTCHA_KEY = None
         self.proxies = []
         self.proxy_index = 0
@@ -62,37 +62,36 @@ class Sowing:
             flush=True
         )
 
-       def welcome(self):
-     print(
-         f"""
-    █████╗ ██████╗ ██████╗     ███╗   ██╗ ██████╗ ██████╗ ███████╗
-   ██╔══██╗██╔══██╗██╔══██╗    ████╗  ██║██╔═══██╗██╔══██╗██╔════╝
-   ███████║██║  ██║██████╔╝    ██╔██╗ ██║██║   ██║██║  ██║█████╗  
-   ██╔══██║██║  ██║██╔══██╗    ██║╚██╗██║██║   ██║██║  ██║██╔══╝  
-   ██║  ██║██████╔╝██████╔╝    ██║ ╚████║╚██████╔╝██████╔╝███████╗
-   ╚═╝  ╚═╝╚═════╝ ╚═════╝     ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝  
-     By : ADB NODE
-     {Fore.GREEN + Style.BRIGHT}Auto Ping {Fore.BLUE + Style.BRIGHT}SowingTaker - BOT
-         """
-         f"""
-     {Fore.GREEN + Style.BRIGHT}Rey? {Fore.YELLOW + Style.BRIGHT}<https://t.me/airdropbombnode>
-         """
-     )
+    def welcome(self):
+        print(
+            f"""
+       █████╗ ██████╗ ██████╗     ███╗   ██╗ ██████╗ ██████╗ ███████╗
+      ██╔══██╗██╔══██╗██╔══██╗    ████╗  ██║██╔═══██╗██╔══██╗██╔════╝
+      ███████║██║  ██║██████╔╝    ██╔██╗ ██║██║   ██║██║  ██║█████╗  
+      ██╔══██║██║  ██║██╔══██╗    ██║╚██╗██║██║   ██║██║  ██║██╔══╝  
+      ██║  ██║██████╔╝██████╔╝    ██║ ╚████║╚██████╔╝██████╔╝███████╗
+      ╚═╝  ╚═╝╚═════╝ ╚═════╝     ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝  
+        By : ADB NODE
+        {Fore.GREEN + Style.BRIGHT}Auto Ping {Fore.BLUE + Style.BRIGHT}SowingTaker - BOT
+            """
+            f"""
+        {Fore.GREEN + Style.BRIGHT}Rey? {Fore.YELLOW + Style.BRIGHT}<https://t.me/airdropbombnode>
+            """
+        )
 
     def format_seconds(self, seconds):
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
-    
+
     def load_2captcha_key(self):
         try:
             with open("2captcha_key.txt", 'r') as file:
                 captcha_key = file.read().strip()
-
             return captcha_key
         except Exception as e:
             return None
-    
+
     async def load_proxies(self, use_proxy_choice: int):
         filename = "proxy.txt"
         try:
@@ -110,7 +109,7 @@ class Sowing:
                     return
                 with open(filename, 'r') as f:
                     self.proxies = [line.strip() for line in f.read().splitlines() if line.strip()]
-            
+
             if not self.proxies:
                 self.log(f"{Fore.RED + Style.BRIGHT}No Proxies Found.{Style.RESET_ALL}")
                 return
@@ -119,7 +118,7 @@ class Sowing:
                 f"{Fore.GREEN + Style.BRIGHT}Proxies Total  : {Style.RESET_ALL}"
                 f"{Fore.WHITE + Style.BRIGHT}{len(self.proxies)}{Style.RESET_ALL}"
             )
-        
+
         except Exception as e:
             self.log(f"{Fore.RED + Style.BRIGHT}Failed To Load Proxies: {e}{Style.RESET_ALL}")
             self.proxies = []
@@ -146,23 +145,22 @@ class Sowing:
         self.account_proxies[token] = proxy
         self.proxy_index = (self.proxy_index + 1) % len(self.proxies)
         return proxy
-    
+
     def generate_address(self, account: str):
         try:
             account = Account.from_key(account)
             address = account.address
-            
             return address
         except Exception as e:
             return None
-        
+
     def mask_account(self, account):
         try:
             mask_account = account[:6] + '*' * 6 + account[-6:]
-            return mask_account 
+            return mask_account
         except Exception as e:
             return None
-    
+
     def generate_payload(self, account: str, address: str, nonce: str):
         try:
             encoded_message = encode_defunct(text=nonce)
@@ -170,19 +168,17 @@ class Sowing:
             signature = to_hex(signed_message.signature)
 
             payload = {
-                "address":address, 
-                "invitationCode":self.REF_CODE, 
-                "message":nonce, 
-                "signature":signature
+                "address": address,
+                "invitationCode": self.REF_CODE,
+                "message": nonce,
+                "signature": signature
             }
-            
             return payload
         except Exception as e:
             raise Exception(f"Generate Req Payload Failed: {str(e)}")
-        
+
     async def get_web3_with_check(self, address: str, use_proxy: bool, retries=3, timeout=60):
         request_kwargs = {"timeout": timeout}
-
         proxy = self.get_next_proxy_for_account(address) if use_proxy else None
 
         if use_proxy and proxy:
@@ -198,14 +194,12 @@ class Sowing:
                     await asyncio.sleep(3)
                     continue
                 raise Exception(f"Failed to Connect to RPC: {str(e)}")
-        
+
     async def get_token_balance(self, address: str, use_proxy: bool):
         try:
             web3 = await self.get_web3_with_check(address, use_proxy)
-
             balance = web3.eth.get_balance(address)
             token_balance = balance / (10 ** 18)
-
             return token_balance
         except Exception as e:
             self.log(
@@ -213,11 +207,10 @@ class Sowing:
                 f"{Fore.RED+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
             )
             return None
-        
+
     async def perform_onchain(self, account: str, address: str, use_proxy: bool):
         try:
             web3 = await self.get_web3_with_check(address, use_proxy)
-
             contract_address = web3.to_checksum_address(self.ACTIVATE_ROUTER_ADDRESS)
             token_contract = web3.eth.contract(address=contract_address, abi=self.ACTIVATE_CONTRACT_ABI)
 
@@ -252,7 +245,7 @@ class Sowing:
                 f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
             )
             return None, None
-    
+
     def print_question(self):
         while True:
             try:
@@ -263,8 +256,8 @@ class Sowing:
 
                 if choose in [1, 2, 3]:
                     proxy_type = (
-                        "With Free Proxyscrape" if choose == 1 else 
-                        "With Private" if choose == 2 else 
+                        "With Free Proxyscrape" if choose == 1 else
+                        "With Private" if choose == 2 else
                         "Without"
                     )
                     print(f"{Fore.GREEN + Style.BRIGHT}Run {proxy_type} Proxy Selected.{Style.RESET_ALL}")
@@ -278,7 +271,6 @@ class Sowing:
         if choose in [1, 2]:
             while True:
                 rotate = input(f"{Fore.BLUE + Style.BRIGHT}Rotate Invalid Proxy? [y/n] -> {Style.RESET_ALL}").strip()
-
                 if rotate in ["y", "n"]:
                     rotate = rotate == "y"
                     break
@@ -286,16 +278,15 @@ class Sowing:
                     print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter 'y' or 'n'.{Style.RESET_ALL}")
 
         return choose, rotate
-    
+
     async def solve_cf_turnstile(self, proxy=None, retries=5):
         for attempt in range(retries):
             connector = ProxyConnector.from_url(proxy) if proxy else None
             try:
                 async with ClientSession(connector=connector, timeout=ClientTimeout(total=60)) as session:
-
                     if self.CAPTCHA_KEY is None:
                         return None
-                    
+
                     url = f"http://2captcha.com/in.php?key={self.CAPTCHA_KEY}&method=turnstile&sitekey={self.SITE_KEY}&pageurl={self.PAGE_URL}"
                     async with session.get(url=url) as response:
                         response.raise_for_status()
@@ -306,7 +297,6 @@ class Sowing:
                             continue
 
                         request_id = result.split('|')[1]
-
                         self.log(
                             f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                             f"{Fore.BLUE+Style.BRIGHT}Req Id  :{Style.RESET_ALL}"
@@ -338,10 +328,10 @@ class Sowing:
                     await asyncio.sleep(5)
                     continue
                 return None
-    
+
     async def generate_nonce(self, address: str, proxy=None):
         url = f"{self.BASE_API}/wallet/generateNonce"
-        data = json.dumps({"walletAddress":address})
+        data = json.dumps({"walletAddress": address})
         headers = {
             **self.headers,
             "Content-Length": str(len(data)),
@@ -361,9 +351,8 @@ class Sowing:
                 f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                 f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
             )
+            return None
 
-        return None
-    
     async def user_login(self, account: str, address: str, nonce: str, proxy=None, retries=5):
         url = f"{self.BASE_API}/wallet/login"
         data = json.dumps(self.generate_payload(account, address, nonce))
@@ -390,9 +379,8 @@ class Sowing:
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
-            
-        return None
-    
+            return None
+
     async def user_info(self, address: str, proxy=None, retries=5):
         url = f"{self.BASE_API}/user/info"
         headers = {
@@ -417,9 +405,8 @@ class Sowing:
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
-            
-        return None
-    
+            return None
+
     async def start_mining(self, address: str, turnstile_token: str, status: bool, proxy=None, retries=5):
         url = f"{self.BASE_API}/task/signIn?status={status}"
         headers = {
@@ -446,9 +433,8 @@ class Sowing:
                     f"{Fore.MAGENTA+Style.BRIGHT}-{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
                 )
+            return None
 
-        return None
-            
     async def process_generate_nonce(self, address: str, use_proxy: bool, rotate_proxy: bool):
         while True:
             proxy = self.get_next_proxy_for_account(address) if use_proxy else None
@@ -456,37 +442,30 @@ class Sowing:
                 f"{Fore.CYAN+Style.BRIGHT}Proxy  :{Style.RESET_ALL}"
                 f"{Fore.WHITE+Style.BRIGHT} {proxy} {Style.RESET_ALL}"
             )
-
             get_nonce = await self.generate_nonce(address, proxy)
             if get_nonce and get_nonce.get("message") == "SUCCESS":
                 nonce = get_nonce["result"]["nonce"]
-                    
                 return nonce
-            
             if rotate_proxy:
                 proxy = self.rotate_proxy_for_account(address)
                 await asyncio.sleep(5)
                 continue
-
             return False
-            
+
     async def process_user_login(self, account: str, address: str, use_proxy: bool, rotate_proxy: bool):
         nonce = await self.process_generate_nonce(address, use_proxy, rotate_proxy)
         if nonce:
             proxy = self.get_next_proxy_for_account(address) if use_proxy else None
-
             login = await self.user_login(account, address, nonce, proxy)
             if login and login.get("message") == "SUCCESS":
                 self.access_tokens[address] = login["result"]["token"]
-
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}Status :{Style.RESET_ALL}"
                     f"{Fore.GREEN+Style.BRIGHT} Login Success {Style.RESET_ALL}"
                 )
                 return True
-            
             return False
-        
+
     async def process_activate_mining(self, account: str, address: str, use_proxy: bool):
         balance = await self.get_token_balance(address, use_proxy)
         tx_fees = 0.000000060305
@@ -500,7 +479,6 @@ class Sowing:
             f"{Fore.BLUE+Style.BRIGHT}Tx Fees :{Style.RESET_ALL}"
             f"{Fore.WHITE+Style.BRIGHT} {tx_fees} TAKER {Style.RESET_ALL}"
         )
-
         if not balance or balance < tx_fees:
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
@@ -508,11 +486,9 @@ class Sowing:
                 f"{Fore.YELLOW+Style.BRIGHT} Insufficient TAKER Balance {Style.RESET_ALL}"
             )
             return False
-
         tx_hash, block_number = await self.perform_onchain(account, address, use_proxy)
         if tx_hash and block_number:
             explorer = f"https://explorer.taker.xyz/tx/{tx_hash}"
-
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                 f"{Fore.BLUE+Style.BRIGHT}Block   :{Style.RESET_ALL}"
@@ -529,34 +505,27 @@ class Sowing:
                 f"{Fore.WHITE+Style.BRIGHT} {explorer} {Style.RESET_ALL}"
             )
             return True
-        
         return False
-            
+
     async def process_accounts(self, account: str, address: str, use_proxy: bool, rotate_proxy: bool):
         logined = await self.process_user_login(account, address, use_proxy, rotate_proxy)
         if logined:
             proxy = self.get_next_proxy_for_account(address) if use_proxy else None
-            
             user = await self.user_info(address, proxy)
             if user and user.get("message") == "SUCCESS":
                 points = user.get("result", {}).get("takerPoints", 0)
-
                 balance = f"{float(points):.1f}"
-
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}Balance:{Style.RESET_ALL}"
                     f"{Fore.WHITE+Style.BRIGHT} {balance} Opoints {Style.RESET_ALL}"
                 )
-
                 self.log(f"{Fore.CYAN+Style.BRIGHT}Mining :{Style.RESET_ALL}")
-
                 first_sign = user.get("result", {}).get("firstSign", False)
                 if first_sign:
                     self.log(
                         f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                         f"{Fore.YELLOW+Style.BRIGHT}Solving Cf Turnstile...{Style.RESET_ALL}"
                     )
-
                     turnstile_token = await self.solve_cf_turnstile(proxy)
                     if turnstile_token:
                         self.log(
@@ -564,7 +533,6 @@ class Sowing:
                             f"{Fore.BLUE+Style.BRIGHT}Message :{Style.RESET_ALL}"
                             f"{Fore.GREEN+Style.BRIGHT} Cf Turnstile Solved Successfully {Style.RESET_ALL}"
                         )
-
                         start = await self.start_mining(address, turnstile_token, "true", proxy)
                         if start and start.get("message") == "SUCCESS":
                             self.log(
@@ -572,18 +540,15 @@ class Sowing:
                                 f"{Fore.BLUE+Style.BRIGHT}Status  :{Style.RESET_ALL}"
                                 f"{Fore.GREEN+Style.BRIGHT} Activated Successfully {Style.RESET_ALL}"
                             )
-
                     else:
                         self.log(
                             f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                             f"{Fore.BLUE+Style.BRIGHT}Message :{Style.RESET_ALL}"
                             f"{Fore.RED+Style.BRIGHT} Cf Turnstile Not Solved {Style.RESET_ALL}"
                         )
-
                 else:
                     next_timestamp = user.get("result", {}).get("nextTimestamp", 0)
                     formatted_timestamp = next_timestamp / 1000
-
                     if int(time.time()) > formatted_timestamp:
                         is_able = await self.process_activate_mining(account, address, use_proxy)
                         if is_able:
@@ -591,7 +556,6 @@ class Sowing:
                                 f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                                 f"{Fore.YELLOW+Style.BRIGHT}Solving Cf Turnstile...{Style.RESET_ALL}"
                             )
-
                             turnstile_token = await self.solve_cf_turnstile(proxy)
                             if turnstile_token:
                                 self.log(
@@ -599,7 +563,6 @@ class Sowing:
                                     f"{Fore.BLUE+Style.BRIGHT}Message :{Style.RESET_ALL}"
                                     f"{Fore.GREEN+Style.BRIGHT} Cf Turnstile Solved Successfully {Style.RESET_ALL}"
                                 )
-
                                 start = await self.start_mining(address, turnstile_token, "false", proxy)
                                 if start and start.get("message") == "SUCCESS":
                                     self.log(
@@ -607,14 +570,12 @@ class Sowing:
                                         f"{Fore.BLUE+Style.BRIGHT}Status  :{Style.RESET_ALL}"
                                         f"{Fore.GREEN+Style.BRIGHT} Activated Successfully {Style.RESET_ALL}"
                                     )
-
                             else:
                                 self.log(
                                     f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                                     f"{Fore.BLUE+Style.BRIGHT}Message :{Style.RESET_ALL}"
                                     f"{Fore.RED+Style.BRIGHT} Cf Turnstile Not Solved {Style.RESET_ALL}"
                                 )
-                        
                     else:
                         reactived_time_wib = datetime.fromtimestamp(formatted_timestamp).astimezone(wib).strftime('%x %X %Z')
                         self.log(
@@ -630,49 +591,39 @@ class Sowing:
         try:
             with open('accounts.txt', 'r') as file:
                 accounts = [line.strip() for line in file if line.strip()]
-
             capctha_key = self.load_2captcha_key()
             if capctha_key:
                 self.CAPTCHA_KEY = capctha_key
-            
             use_proxy_choice, rotate_proxy = self.print_question()
-
             while True:
                 use_proxy = False
                 if use_proxy_choice in [1, 2]:
                     use_proxy = True
-
                 self.clear_terminal()
                 self.welcome()
                 self.log(
                     f"{Fore.GREEN + Style.BRIGHT}Account's Total: {Style.RESET_ALL}"
                     f"{Fore.WHITE + Style.BRIGHT}{len(accounts)}{Style.RESET_ALL}"
                 )
-
                 if use_proxy:
                     await self.load_proxies(use_proxy_choice)
-                
                 separator = "=" * 25
                 for account in accounts:
                     if account:
                         address = self.generate_address(account)
-
                         self.log(
                             f"{Fore.CYAN + Style.BRIGHT}{separator}[{Style.RESET_ALL}"
                             f"{Fore.WHITE + Style.BRIGHT} {self.mask_account(address)} {Style.RESET_ALL}"
                             f"{Fore.CYAN + Style.BRIGHT}]{separator}{Style.RESET_ALL}"
                         )
-
                         if not address:
                             self.log(
                                 f"{Fore.CYAN + Style.BRIGHT}Status    :{Style.RESET_ALL}"
                                 f"{Fore.RED + Style.BRIGHT} Invalid Private Key or Library Version Not Supported {Style.RESET_ALL}"
                             )
                             continue
-
                         await self.process_accounts(account, address, use_proxy, rotate_proxy)
                         await asyncio.sleep(3)
-
                 self.log(f"{Fore.CYAN + Style.BRIGHT}={Style.RESET_ALL}"*72)
                 seconds = 3 * 60 * 60
                 while seconds > 0:
@@ -687,7 +638,6 @@ class Sowing:
                     )
                     await asyncio.sleep(1)
                     seconds -= 1
-
         except FileNotFoundError:
             self.log(f"{Fore.RED}File 'accounts.txt' Not Found.{Style.RESET_ALL}")
             return
@@ -703,5 +653,5 @@ if __name__ == "__main__":
         print(
             f"{Fore.CYAN + Style.BRIGHT}[ {datetime.now().astimezone(wib).strftime('%x %X %Z')} ]{Style.RESET_ALL}"
             f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-            f"{Fore.RED + Style.BRIGHT}[ EXIT ] Sowing Taker - BOT{Style.RESET_ALL}                                       "                              
+            f"{Fore.RED + Style.BRIGHT}[ EXIT ] Sowing Taker - BOT{Style.RESET_ALL}"
         )
